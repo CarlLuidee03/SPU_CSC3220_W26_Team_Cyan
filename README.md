@@ -7,3 +7,9 @@ Email: limc1@spu.edu
 Phone: 253-205-6966
 
 ID: CarlLuidee03
+
+## Dominic Hatcher-Thomassen
+
+Email: hatcherthomd@spu.edu
+Phone: 425-268-4217
+ID: Dominic-H-T
