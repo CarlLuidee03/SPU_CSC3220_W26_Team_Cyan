@@ -15,3 +15,12 @@ Email: hatcherthomd@spu.edu
 Phone: 425-268-4217
 
 ID: Dominic-H-T
+
+
+## Tatiana Arias
+
+Email: ariast@spu.edu
+
+Phone: 425-471-8268
+
+ID: tatianasarias
