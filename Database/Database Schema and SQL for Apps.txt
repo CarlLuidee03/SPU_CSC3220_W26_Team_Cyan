@@ -1,0 +1,110 @@
+
+Database Schema
+-------------
+CREATE TABLE Measurements (
+    measurement_id INT PRIMARY KEY AUTO_INCREMENT,
+    unit_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE Ingredients (
+    ingredient_id INT PRIMARY KEY AUTO_INCREMENT,
+    ingredient_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE Tags (
+    tag_id INT PRIMARY KEY AUTO_INCREMENT,
+    tag_name VARCHAR(50) NOT NULL UNIQUE,
+    tag_type VARCHAR(50) -- e.g., 'difficulty', 'cuisine type', 'dietary'
+);
+
+CREATE TABLE Recipes (
+    recipe_id INT PRIMARY KEY AUTO_INCREMENT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    instructions TEXT,
+    serving_size DECIMAL(5, 2) -- Default serving size
+);
+
+CREATE TABLE RecipeIngredients (
+    recipe_id INT NOT NULL,
+    ingredient_id INT NOT NULL,
+    measurement_id INT NOT NULL,
+    quantity DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (recipe_id, ingredient_id, measurement_id),
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id) ON DELETE CASCADE,
+    FOREIGN KEY (ingredient_id) REFERENCES Ingredients(ingredient_id),
+    FOREIGN KEY (measurement_id) REFERENCES Measurements(measurement_id)
+);
+
+CREATE TABLE RecipeTags (
+    recipe_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (recipe_id, tag_id),
+    FOREIGN KEY (recipe_id) REFERENCES Recipes(recipe_id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES Tags(tag_id)
+);
+
+--------------
+SQL Statements
+
+====
+SELECT
+    R.title AS recipe_title,
+    I.ingredient_name,
+    RI.quantity,
+    M.unit_name AS unit
+FROM
+    Recipes R
+JOIN
+    RecipeIngredients RI ON R.recipe_id = RI.recipe_id
+JOIN
+    Ingredients I ON RI.ingredient_id = I.ingredient_id
+JOIN
+    Measurements M ON RI.measurement_id = M.measurement_id
+WHERE
+    R.title = 'Spaghetti Bolognese'; -- Example condition
+=====
+START TRANSACTION;
+
+-- Update the serving size and title of two specific recipes
+UPDATE Recipes
+SET serving_size = 6.0, title = 'Classic Spaghetti Bolognese'
+WHERE recipe_id IN (1, 2);
+
+-- Update the quantity of a specific ingredient in related tables if necessary
+-- For example, change 'tomato' quantity for a specific recipe
+UPDATE RecipeIngredients
+SET quantity = 800.00
+WHERE recipe_id = 1 AND ingredient_id = (SELECT ingredient_id FROM Ingredients WHERE ingredient_name = 'Tomato');
+
+COMMIT;
+=====
+START TRANSACTION;
+
+-- Insert a new recipe
+INSERT INTO Recipes (title, description, instructions, serving_size)
+VALUES ('Simple Salad', 'A quick and healthy salad.', '1. Chop all ingredients. 2. Mix with dressing.', 2.0);
+
+SET @new_recipe_id = LAST_INSERT_ID();
+
+-- Insert ingredients for the new recipe
+INSERT INTO RecipeIngredients (recipe_id, ingredient_id, measurement_id, quantity)
+VALUES
+    (@new_recipe_id, (SELECT ingredient_id FROM Ingredients WHERE ingredient_name = 'Lettuce'), (SELECT measurement_id FROM Measurements WHERE unit_name = 'grams'), 200.00),
+    (@new_recipe_id, (SELECT ingredient_id FROM Ingredients WHERE ingredient_name = 'Tomato'), (SELECT measurement_id FROM Measurements WHERE unit_name = 'grams'), 100.00);
+
+-- Insert tags for the new recipe
+INSERT INTO RecipeTags (recipe_id, tag_id)
+VALUES
+    (@new_recipe_id, (SELECT tag_id FROM Tags WHERE tag_name = 'Easy'));
+
+COMMIT;
+====
+START TRANSACTION;
+
+-- Delete a specific recipe and all its associated ingredients and tags
+DELETE FROM Recipes
+WHERE title = 'Simple Salad'; -- or use recipe_id = @new_recipe_id
+
+COMMIT;
+=====
