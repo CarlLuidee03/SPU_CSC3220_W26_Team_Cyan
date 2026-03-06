@@ -1,0 +1,20 @@
+# Mac
+.DS_Store
+
+# Qt Creator
+*.creator
+*.creator.user
+*.creator.user.*
+*.pro.user
+
+# Build folders
+build/
+build-*/
+cmake-build*/
+CMakeFiles/
+CMakeCache.txt
+
+# Qt build outputs
+*.app
+*.o
+*.obj
