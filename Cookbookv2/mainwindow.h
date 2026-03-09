@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "database/RecipeRepository.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,5 +20,12 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    RecipeRepository m_repository;
+
+    void loadRecipes();
+    void onAddRecipeClicked();
+    void showRecipeDetails();
+    void onDeleteRecipeClicked();
+    void onEditRecipeClicked();
 };
 #endif // MAINWINDOW_H
